@@ -1,0 +1,17 @@
+********************************************************************************
+                                                                                
+                                                          :::      ::::::::     
+     notes                                              :+:      :+:    :+:     
+                                                      +:+ +:+         +:+       
+     By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+          
+                                                  +#+#+#+#+#+   +#+             
+     Created: 2018/08/22 12:20:51 by jkellehe          #+#    #+#               
+     Updated: 2018/08/24 12:44:32 by jkellehe         ###   ########.fr         
+                                                                                
+********************************************************************************
+
+re-find out how to make .a files and what exactly they are.   I am thinking the piscine videos
+
+going to make an enum for every flag.   this will specify type for va_arg, and also for the function dbl pointer.
+
+must figure out how many flags and what they do (wiki printf).
