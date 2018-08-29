@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/27 15:41:37 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/28 19:02:22 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,21 @@
 
 #include "printf.h"
 
-int		precision(char *format, va_list ap)
+int		precision(char *format, va_list ap, t_ap *tree)
 {
-	int prec;
-
-	prec = 0;
+	tree->prec = 0;
+	tree->width = 0;
 	while (*format != '.' && *format != '%')
 		format--;
 	if(*format == '%')
 		return (10000);
-	prec = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[1]));
-	return (prec);
+	tree->prec = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[1]));
+
+	tree->width = (format[-1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[-1]));
+	return (tree->prec);
 }
 
-int		digit(va_list ap, char *format)//this should convert all to long longs, and handle flags relevant to numbers
+int		digit(va_list ap, char *format, t_ap *tree)//this should convert all to long longs, and handle flags relevant to numbers
 {
 	long long	holder;
 	long long	base;
@@ -45,26 +46,28 @@ int		digit(va_list ap, char *format)//this should convert all to long longs, and
 		holder = (long long)va_arg(ap, long long);
 	else if (format[-1] == 'l')
 		holder = (long long)va_arg(ap, long);
-	ft_putstr_fd_prec(ft_lltoa_base(holder, base, format), 1, precision(format, ap));
+	ft_putstr_fd_prec(ft_lltoa_base(holder, base, format), 1, precision(format, ap, tree), tree);
 	return(0);
 }
 
-int		str(va_list ap, char *format)
+int		str(va_list ap, char *format, t_ap *tree)
 {
 	char *hold = va_arg(ap, char*);
-	ft_putstr_fd_prec(hold, 1, precision(format, ap));
+	ft_putstr_fd_prec(hold, 1, precision(format, ap, tree), tree);
 	return(0);
 }
 
-int		percent(va_list ap, char *format)
+int		percent(va_list ap, char *format, t_ap *tree)
 {
 	ap += 0;
 	write(1, "%", 1);
 	return (0);
 }
 
-void	assign_functs(int (**p) (va_list ap, char *format))
+void	assign_functs(int (**p) (va_list ap, char *format, t_ap *tree), t_ap *tree)
 {
+	//tree->c = (char*)malloc(sizeof(char) * 2);
+	tree->fd = 1;
 	p['O'] = digit;
 	p['o'] = digit;
 	p['b'] = digit;
@@ -78,23 +81,33 @@ void	assign_functs(int (**p) (va_list ap, char *format))
 
 }
 
+void	flags(char *c, t_ap *tree)
+{
+	tree->left = (*c == '-') ? (1) : (tree->left);
+	tree->l = (*c == 'l') ? (1) : (tree->l);
+	tree->ll = (*c == 'l' && c[-1] == 'l') ? (1) : (tree->ll);
+}
+
 int		ft_printf(const char * restrict format, ...)
 {
 	va_list			ap;
-	int				(*p[123]) (va_list ap, char *format);
+	int				(*p[123]) (va_list ap, char *format, t_ap *tree);
  	int				i;
-	int type;
+	t_ap			*tree;
+	
+	if (!(tree = (t_ap*)ft_memalloc(sizeof(t_ap))))
+		return (0);
 	i = 0;
-
-	assign_functs(p);
+	assign_functs(p, tree);
 	va_start(ap, format);
 	while (format[i] != '\0')
 	{
 		if(format[i] == '%')
 		{
             while(!IS_TYPE(format[i]))
-                i++;
-			p[format[i]](ap, (char*)&format[i]);//execute the right function
+                flags((char*)&format[i++], tree);
+			tree->c = (char*)&format[i];
+			p[format[i]](ap, (char*)&format[i], tree);//execute the right function
 			i++;
 		}
 		else 
@@ -107,9 +120,9 @@ int		ft_printf(const char * restrict format, ...)
 int main()
 {
 	char	*hey = "dan";
-	unsigned long	dude = 42;
+	unsigned long	dude = 420;
 
-	ft_printf("this is a number: %.4ld\n and this guy rox: %.5s\n", dude, hey);
-	printf("this is a number: %.4ld\n and this guy rox: %.5s\n", dude, hey);
+	ft_printf("%7.4ld\n%4.5s\n", dude, hey);
+	   printf("%7.4ld\n%4.5s\n", dude, hey);
 	return(0);
 }

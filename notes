@@ -6,7 +6,7 @@
      By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+          
                                                   +#+#+#+#+#+   +#+             
      Created: 2018/08/22 12:20:51 by jkellehe          #+#    #+#               
-     Updated: 2018/08/24 12:44:32 by jkellehe         ###   ########.fr         
+     Updated: 2018/08/28 16:04:04 by jkellehe         ###   ########.fr         
                                                                                 
 ********************************************************************************
 
@@ -15,3 +15,8 @@ re-find out how to make .a files and what exactly they are.   I am thinking the 
 going to make an enum for every flag.   this will specify type for va_arg, and also for the function dbl pointer.
 
 must figure out how many flags and what they do (wiki printf).
+
+________
+now there is a struct, now to start using it without breaking stuff.  
+	-use char c for the final determinant char
+		 -use thhis in ft_putstr_fd_prec to determine not to use padding. 
