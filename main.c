@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/28 19:02:22 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/28 20:32:10 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,10 @@ void	assign_functs(int (**p) (va_list ap, char *format, t_ap *tree), t_ap *tree)
 	p['i'] = digit;
 	p['s'] = str;
 	p['%'] = percent;
-
+	p['f'] = floot;
+	p['F'] = floot;
+	p['a'] = floot;
+	p['A'] = floot;
 }
 
 void	flags(char *c, t_ap *tree)
@@ -122,7 +125,9 @@ int main()
 	char	*hey = "dan";
 	unsigned long	dude = 420;
 
-	ft_printf("%7.4ld\n%4.5s\n", dude, hey);
-	   printf("%7.4ld\n%4.5s\n", dude, hey);
+    float dog = 42.55555555555555;
+    double doggy = 42.55555555555555;
+	ft_printf("%4.5s\n%f\n%f\n", hey, dog, doggy);
+	printf("%4.5s\n%f\n%f\n", hey, dog, doggy);
 	return(0);
 }

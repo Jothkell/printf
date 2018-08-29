@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/23 16:24:30 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/28 20:32:54 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/28 20:23:04 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ struct					s_ap
 };
 
 //width, precision, left align. 
-int						floot(va_list ap, char *format, t_ap *tree);
+
 char					*ft_ftoa_base(double n, long long base, char *format);
 void					ft_putstr_fd_prec(char *s, int fd, int prec, t_ap *tree);
 int						precision(char *format, va_list ap, t_ap *tree);
