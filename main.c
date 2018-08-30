@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/28 20:32:10 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/30 11:38:11 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,14 @@ int		precision(char *format, va_list ap, t_ap *tree)
 	while (*format != '.' && *format != '%')
 		format--;
 	if(*format == '%')
+	{
+		tree->prec = 10000;
 		return (10000);
+	}
 	tree->prec = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[1]));
-
-	tree->width = (format[-1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[-1]));
+	while (isDIGIT(format[-1]) && format[1] != '*')
+		format--;
+	tree->width = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[0]));
 	return (tree->prec);
 }
 
@@ -68,6 +72,7 @@ void	assign_functs(int (**p) (va_list ap, char *format, t_ap *tree), t_ap *tree)
 {
 	//tree->c = (char*)malloc(sizeof(char) * 2);
 	tree->fd = 1;
+	tree->decimal = 0;
 	p['O'] = digit;
 	p['o'] = digit;
 	p['b'] = digit;
@@ -111,6 +116,7 @@ int		ft_printf(const char * restrict format, ...)
                 flags((char*)&format[i++], tree);
 			tree->c = (char*)&format[i];
 			p[format[i]](ap, (char*)&format[i], tree);//execute the right function
+			assign_functs(p, tree);
 			i++;
 		}
 		else 
@@ -122,12 +128,12 @@ int		ft_printf(const char * restrict format, ...)
 
 int main()
 {
-	char	*hey = "dan";
+	char	*hey = "jt";
 	unsigned long	dude = 420;
 
-    float dog = 42.55555555555555;
-    double doggy = 42.55555555555555;
-	ft_printf("%4.5s\n%f\n%f\n", hey, dog, doggy);
-	printf("%4.5s\n%f\n%f\n", hey, dog, doggy);
+    double dog = 420.555555;
+    double doggy = 420.55555555555555;
+	ft_printf("%-6.2f\n%-6.1f\n", dog, doggy);
+	printf("%-6.2f\n%-6.1f\n", dog, doggy);
 	return(0);
 }

@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/24 18:51:31 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/28 20:49:07 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/30 11:08:29 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,24 +26,51 @@ char *ft_pad(char *s, int prec, t_ap *tree)
 {
 	int i;
 	int hold;
+	int widthh;
+	int prech;
 
 	i = 0;
 	hold = tree->width;
+	widthh = 0;
+	prech = 0;
 	tree->width -= (tree->width > tree->prec) ? (tree->prec) : (tree->width);
 	tree->width = (!NUMBERS(tree->c)) ? (hold - ft_strlen(s)) : (tree->width);
 	tree->prec -= (tree->prec > ft_strlen(s)) ? (ft_strlen(s)) : (tree->prec);
-    while (tree->width > 0)
+	widthh = tree->width;
+	prech = tree->prec;
+	(tree->left) ? (ft_putstr_fd(s, 1)) : (1);
+    while (widthh > 0)
     {
 		write(1, " ", 1);
-        tree->width--;
+        widthh--;
     }
-	while ((tree->prec > 0) && NUMBERS(tree->c))
+	while ((prech > 0) && NUMBERS(tree->c))
 	{
 		write(1, "0", 1);
-		tree->prec--;
+		prech--;
 	}
-	ft_putstr_fd(s, 1);
+	!(tree->left) ? (ft_putstr_fd(s, 1)) : (1);
 	return (s);
+}
+
+void	ft_fpad(char *s, t_ap *tree)
+{
+	tree->width -= (tree->prec == 10000) ? (ft_strlen(s) + 6) : (ft_strlen(s) + tree->prec + 1);
+	tree->width = (tree->width < 0) ? (0) : (tree->width);
+	tree->width += (tree->prec == 0) ? (1) : (0);
+	while(((tree->width) > 0) && !(tree->decimal))
+	{
+		write(1, " ", 1);
+		tree->width--;
+	}
+    ft_putstr_fd(s, 1);
+	tree->prec -= (tree->decimal) ? (ft_strlen(s)) : (0);
+    while ((tree->prec > 0) && tree->decimal)
+    {
+        write(1, "0", 1);
+        tree->prec--;
+    }
+    tree->decimal = 1;
 }
 
 void    ft_putstr_fd_prec(char *s, int fd, int prec, t_ap *tree)
@@ -53,8 +80,12 @@ void    ft_putstr_fd_prec(char *s, int fd, int prec, t_ap *tree)
 	i = 0;
     if (!s)
         return ;
-	if (prec != 10000)
+	if (prec != 10000 && !FLOATS(tree->c))
 		ft_pad(ft_strsub(s, 0, prec), prec, tree);
+	else if (prec != 10000 && tree->decimal)
+		ft_fpad(ft_strsub(s, 0, prec), tree);
+	else if (prec != 10000)
+		ft_fpad(s, tree);
 	else
 		ft_putstr_fd(s, 1);
 }
@@ -120,12 +151,14 @@ char            *ft_ftoa_base(double n, long long base, char *format)
     return (hold);
 }
 
-float decimals(float holder, float base)
+int decimals(double holder, float base, t_ap *tree)
 {
-	int i = 6;
+	int i = tree->prec;
 	int tip = 0;
 	float top = 0;
 
+	holder *= (holder < 0) ? (-1) : (1);
+	i = (i == 10000) ? (6) : (i);
 	tip = (int)holder;
 	top = (float)tip;
 	holder -= top;
@@ -134,24 +167,33 @@ float decimals(float holder, float base)
 		holder *= base;
 		i--;
 	}
-	return (holder);
+	tip = (int)holder;
+	tip *= (tip < 0) ? (-1) : (1);
+	if (((int)(holder * base) % (int)base) >= ((int)base /2))
+	{
+		tip += 1;
+	}
+	(tree->prec) ? (write(1, ".", 1)) : (1);
+	return (tip);
 }
 
 int floot(va_list ap, char *format, t_ap *tree)
 {
-	float holder;
+	double holder;
 	float base;
+	int temp;//cut out later by placing decimals in next line's call
 
-    if (format[0] != 'f' || format[0] != 'F' || !(base = 10))
-        base = (format[0] == 'a' || format[0] == 'A') ? (16) : (base);
-    if (format[-1] == '%')
-        holder = (long long)va_arg(ap, double);
-    else if (format[-1] == 'l' && format[-2] == 'l')
-        holder = (long long)va_arg(ap, long long);
-    else if (format[-1] == 'l')
-        holder = (long long)va_arg(ap, long);
-    ft_putstr_fd_prec(ft_lltoa_base((int)holder, (int)base, format), 1, precision(format, ap, tree), tree);
-	holder = (decimals(holder, base));
-	ft_putstr_fd_prec(ft_lltoa_base((int)holder, (int)base, format), 1, tree->prec, tree);
+    if (format[0] == 'f' || format[0] == 'F')//whyd you have to go and make it so complicated
+		base = 10;
+	else
+		base = 16;
+    holder = va_arg(ap, double);
+	temp = precision(format, ap, tree);
+	if((tree->prec == 0) && ((((int)(holder * base) % (int)base) >= ((int)base /2)) ||
+							 (((int)(-1 * holder * base) % (int)base) >= ((int)base /2))))
+		holder += (holder > 0) ? (1) : (-1);
+    ft_putstr_fd_prec(ft_lltoa_base((int)holder, (int)base, format), 1, temp, tree);
+	temp = (decimals(holder, base, tree));
+	ft_putstr_fd_prec(ft_lltoa_base((int)temp, (int)base, format), 1, tree->prec, tree);
     return(0);
 }

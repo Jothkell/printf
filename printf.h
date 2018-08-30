@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/23 16:24:30 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/28 20:32:54 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/29 18:54:34 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,16 @@
 
 # define IS_UPPER(x) (x >= 'A' && x <= 'Z')
 # define IS_LOWER(x) (x >= 'a' && x <= 'z')
-# define IS_TYPE(x) (x == 's' || x == 'S' || x == 'p' || x == 'd' || x == 'D' || x == 'i' || x == 'o' || x == 'O' || x == 'u' || x == 'U' || x == 'x' || x == 'X' || x == 'c' || x == 'C' || x == 'b')
+# define IS_TYPE(x) (x == 's' || x == 'S' || x == 'p' || x == 'd' || x == 'D' || x == 'i' || x == 'o' || x == 'O' || x == 'u' || x == 'U' || x == 'x' || x == 'X' || x == 'c' || x == 'C' || x == 'b' || x == 'f' || x == 'F' || x == 'a' || x == 'A')
 # define NUMBERS(x) (*x == 'd' || *x == 'D' || *x == 'x' || *x == 'X' || *x == 'b' || *x == 'o' || *x == 'O')
-
+# define FLOATS(x) (*x == 'f' || *x == 'F' || *x =='a' || *x == 'A')
+# define isDIGIT(x) (x == '0' || x == '1' || x == '2' || x == '3' || x == '4' || x == '5' || x == '6' || x == '7' || x == '8' || x == '9')
 typedef struct s_ap t_ap;
 
 struct					s_ap
 {
-	unsigned int prec;
-	unsigned int width;
+	int prec;
+	int width;
 	uint8_t left;
 	uint8_t X;
 	uint8_t O;
@@ -37,7 +38,9 @@ struct					s_ap
 	uint8_t l;
 	uint8_t ll;
 	uint8_t fd;
+	uint8_t decimal;
 	char *c;
+
 };
 
 //width, precision, left align. 
@@ -50,5 +53,7 @@ void					assign_functs(int (**p) (va_list ap, char *format, t_ap *tree), t_ap *t
 int						digit(va_list ap, char *format, t_ap *tree);
 int						ft_printf(const char * restrict format, ...);
 void					flags(char *c, t_ap *tree);
+int						decimals(double holder, float base, t_ap *tree);
+
 
 # endif
