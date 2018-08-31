@@ -6,11 +6,11 @@
 #    By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2018/08/14 21:44:46 by jkellehe          #+#    #+#              #
-#    Updated: 2018/08/30 11:37:03 by jkellehe         ###   ########.fr        #
+#    Updated: 2018/08/30 12:54:11 by jkellehe         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
-NAME = getnextline
+NAME = libftprintf.a
 
 SRC = main.c mod.c
 
@@ -20,19 +20,21 @@ LIBFT = -L./libft -lft
 
 LIB = libft
 
-all: $(NAME) $(LIB) $(MINIL)
+all:  $(NAME)
 
 $(NAME):
-	gcc -g -c -Wall -Wextra -Werror $(SRC) -I$(HEADER)
-	gcc -o $(NAME) *.o $(LIBFT)
-
-$(LIB):
+	@gcc -g -c $(SRC) -I$(HEADER)
 	@make -C $(LIB)
+	@cp libft/libft.a $(NAME)
+	@ar rc $(NAME) *.o
+	@ranlib $(NAME)
 
 clean:
-	/bin/rm -f *.o
+	@rm -f *.o
+	@make clean -C $(LIB)
 
 fclean: clean
-	/bin/rm -f $(NAME)
+	@rm -f $(NAME)
+	@make fclean -C $(LIB)
 
 re: fclean all

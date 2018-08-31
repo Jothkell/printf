@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/30 11:38:11 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/30 21:09:27 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,17 +22,22 @@ int		precision(char *format, va_list ap, t_ap *tree)
 {
 	tree->prec = 0;
 	tree->width = 0;
-	while (*format != '.' && *format != '%')
+	format--;
+	while (*format != '.' && *format != '%' && *format != '-')
 		format--;
-	if(*format == '%')
+	if(*format == '%' && !ft_atoi(&format[1]))
 	{
 		tree->prec = 10000;
 		return (10000);
 	}
+	format += (format[1] == '-') ? (1) : (0);
 	tree->prec = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[1]));
+	tree->width = (isDIGIT(format[1])) ? (ft_atoi(&format[1])) : (tree->width);
+	tree->prec -= (isDIGIT(format[1])) ? (tree->prec) : (0);
 	while (isDIGIT(format[-1]) && format[1] != '*')
 		format--;
-	tree->width = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[0]));
+	tree->width = (format[1] == '*') ? (va_arg(ap, int)) : (tree->width);//ft_atoi(&format[0]));
+	tree->width = (isDIGIT(*format)) ? (ft_atoi(format)) : (tree->width);
 	return (tree->prec);
 }
 
@@ -44,12 +49,13 @@ int		digit(va_list ap, char *format, t_ap *tree)//this should convert all to lon
 	if (format[0] != 'd' || !(base = 10))
 		base = (format[0] == 'x' || format[0] == 'X') ? (16) : (2);
 	base = (format[0] == 'o' || format[0] == 'O') ? (8) : (base);
-	if (format[-1] == '%')
+	if (!isID(format[-1]))//format[-1] == '%')
 		holder = (long long)va_arg(ap, int);
 	else if (format[-1] == 'l' && format[-2] == 'l')
 		holder = (long long)va_arg(ap, long long);
 	else if (format[-1] == 'l')
 		holder = (long long)va_arg(ap, long);
+	holder = (base == 16 && holder < 0) ? ((unsigned int)holder) : (holder);
 	ft_putstr_fd_prec(ft_lltoa_base(holder, base, format), 1, precision(format, ap, tree), tree);
 	return(0);
 }
@@ -64,7 +70,22 @@ int		str(va_list ap, char *format, t_ap *tree)
 int		percent(va_list ap, char *format, t_ap *tree)
 {
 	ap += 0;
+	precision(format, ap, tree);
+	tree->width--;
+	while(((tree->width) > 0) && !(tree->left))
+	{
+		write(1, " ", 1);
+		tree->width--;
+		tree->ret++;
+	}
 	write(1, "%", 1);
+	tree->ret++;
+    while(((tree->width) > 0) && (tree->left))
+    {
+        write(1, " ", 1);
+        tree->width--;
+        tree->ret++;
+    }
 	return (0);
 }
 
@@ -106,12 +127,14 @@ int		ft_printf(const char * restrict format, ...)
 	if (!(tree = (t_ap*)ft_memalloc(sizeof(t_ap))))
 		return (0);
 	i = 0;
+	tree->ret = 0;
 	assign_functs(p, tree);
 	va_start(ap, format);
 	while (format[i] != '\0')
 	{
 		if(format[i] == '%')
 		{
+			i++;
             while(!IS_TYPE(format[i]))
                 flags((char*)&format[i++], tree);
 			tree->c = (char*)&format[i];
@@ -120,20 +143,30 @@ int		ft_printf(const char * restrict format, ...)
 			i++;
 		}
 		else 
+		{
 			write(1, &format[i++], 1);
+			tree->ret++;
+		}
 	}
 	va_end(ap);
-	return (0);
+	return (tree->ret);
 }
 
 int main()
 {
-	char	*hey = "jt";
+	char	*hey = "whoa";
 	unsigned long	dude = 420;
+	int ret = 0;
+	int ret2 = 0;
+	int fort2 = 42;
 
     double dog = 420.555555;
     double doggy = 420.55555555555555;
-	ft_printf("%-6.2f\n%-6.1f\n", dog, doggy);
-	printf("%-6.2f\n%-6.1f\n", dog, doggy);
+	ret = ft_printf("%10x", fort2);
+	printf("\n");
+	ret2 = printf("%10x", fort2);
+	printf("\n");
+	printf("%d %d\n", ret, ret2);
 	return(0);
 }
+

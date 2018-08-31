@@ -6,11 +6,27 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/24 18:51:31 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/30 11:08:29 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/30 14:48:22 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "printf.h"
+
+int    bt_putstr_fd(char const *s, int fd)
+{
+	int ret;
+
+	ret = 0;
+    if (!s)
+        return (0);
+    while (*s != '\0')
+    {
+        write(fd, s, 1);
+        s++;
+		ret++;
+    }
+	return (ret);
+}
 
 static  int     count_size(long long n)
 {
@@ -38,18 +54,20 @@ char *ft_pad(char *s, int prec, t_ap *tree)
 	tree->prec -= (tree->prec > ft_strlen(s)) ? (ft_strlen(s)) : (tree->prec);
 	widthh = tree->width;
 	prech = tree->prec;
-	(tree->left) ? (ft_putstr_fd(s, 1)) : (1);
+	tree->ret += (tree->left) ? (bt_putstr_fd(s, 1)) : (0);
     while (widthh > 0)
     {
 		write(1, " ", 1);
         widthh--;
+		tree->ret++;
     }
 	while ((prech > 0) && NUMBERS(tree->c))
 	{
 		write(1, "0", 1);
 		prech--;
+		tree->ret++;
 	}
-	!(tree->left) ? (ft_putstr_fd(s, 1)) : (1);
+	tree->ret += !(tree->left) ? (bt_putstr_fd(s, 1)) : (0);
 	return (s);
 }
 
@@ -62,13 +80,15 @@ void	ft_fpad(char *s, t_ap *tree)
 	{
 		write(1, " ", 1);
 		tree->width--;
+		tree->ret++;
 	}
-    ft_putstr_fd(s, 1);
+    tree->ret += bt_putstr_fd(s, 1);
 	tree->prec -= (tree->decimal) ? (ft_strlen(s)) : (0);
     while ((tree->prec > 0) && tree->decimal)
     {
         write(1, "0", 1);
         tree->prec--;
+		tree->ret++;
     }
     tree->decimal = 1;
 }
@@ -87,7 +107,7 @@ void    ft_putstr_fd_prec(char *s, int fd, int prec, t_ap *tree)
 	else if (prec != 10000)
 		ft_fpad(s, tree);
 	else
-		ft_putstr_fd(s, 1);
+		tree->ret += bt_putstr_fd(s, 1);
 }
 
 char            *ft_lltoa_base(long long n, long long base, char *format)
@@ -173,7 +193,7 @@ int decimals(double holder, float base, t_ap *tree)
 	{
 		tip += 1;
 	}
-	(tree->prec) ? (write(1, ".", 1)) : (1);
+	tree->ret += (tree->prec) ? (write(1, ".", 1)) : (0);
 	return (tip);
 }
 
