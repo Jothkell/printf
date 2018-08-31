@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/24 18:51:31 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/30 14:48:22 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/31 10:34:31 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,11 +49,13 @@ char *ft_pad(char *s, int prec, t_ap *tree)
 	hold = tree->width;
 	widthh = 0;
 	prech = 0;
-	tree->width -= (tree->width > tree->prec) ? (tree->prec) : (tree->width);
-	tree->width = (!NUMBERS(tree->c)) ? (hold - ft_strlen(s)) : (tree->width);
+	//tree->width -= (tree->width > tree->prec) ? (tree->prec) : (tree->width);
+    tree->prec = (tree->prec <= 0) ? (ft_strlen(s)) : (tree->prec);
+	tree->width = (!NUMBERS(tree->c)) ? (hold - ft_strlen(s)) : (tree->width - tree->prec);
 	tree->prec -= (tree->prec > ft_strlen(s)) ? (ft_strlen(s)) : (tree->prec);
+    prech = (tree->prec <= 0) ? (0) : (tree->prec);
+    tree->prec = (tree->prec <= 0) ? (ft_strlen(s)) : (tree->prec);
 	widthh = tree->width;
-	prech = tree->prec;
 	tree->ret += (tree->left) ? (bt_putstr_fd(s, 1)) : (0);
     while (widthh > 0)
     {
@@ -67,7 +69,7 @@ char *ft_pad(char *s, int prec, t_ap *tree)
 		prech--;
 		tree->ret++;
 	}
-	tree->ret += !(tree->left) ? (bt_putstr_fd(s, 1)) : (0);
+	tree->ret += !(tree->left) ? (bt_putstr_fd(ft_strsub(s, 0, tree->prec), 1)) : (0);
 	return (s);
 }
 
@@ -101,7 +103,7 @@ void    ft_putstr_fd_prec(char *s, int fd, int prec, t_ap *tree)
     if (!s)
         return ;
 	if (prec != 10000 && !FLOATS(tree->c))
-		ft_pad(ft_strsub(s, 0, prec), prec, tree);
+		ft_pad(s, prec, tree);
 	else if (prec != 10000 && tree->decimal)
 		ft_fpad(ft_strsub(s, 0, prec), tree);
 	else if (prec != 10000)

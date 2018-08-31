@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/23 16:24:30 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/30 20:51:55 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/31 11:04:20 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@
 # define NUMBERS(x) (*x == 'd' || *x == 'D' || *x == 'x' || *x == 'X' || *x == 'b' || *x == 'o' || *x == 'O')
 # define FLOATS(x) (*x == 'f' || *x == 'F' || *x =='a' || *x == 'A')
 # define isDIGIT(x) (x == '0' || x == '1' || x == '2' || x == '3' || x == '4' || x == '5' || x == '6' || x == '7' || x == '8' || x == '9')
-# define isID(x) (x == 'h' || x == 'l' || x == 'j' || x == 'j' || x == 'z')
+# define isID(x) (x == 'h' || x == 'l' || x == 'j' || x == 'z')
+# define HH(x) (x[-1] == 'h' && x[-2] == 'h')
+# define LL(x) (x[-1] == 'l' && x[-2] == 'l')
 
 typedef struct s_ap t_ap;
 

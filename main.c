@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/30 21:09:27 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/08/31 11:06:48 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,13 +49,23 @@ int		digit(va_list ap, char *format, t_ap *tree)//this should convert all to lon
 	if (format[0] != 'd' || !(base = 10))
 		base = (format[0] == 'x' || format[0] == 'X') ? (16) : (2);
 	base = (format[0] == 'o' || format[0] == 'O') ? (8) : (base);
-	if (!isID(format[-1]))//format[-1] == '%')
+	if(HH(format))
+		holder = (long long)va_arg(ap, signed char);
+	else if (format[-1] == 'h')
+		holder = (long long)va_arg(ap, short);
+	else if (!isID(format[-1]))//format[-1] == '%')
 		holder = (long long)va_arg(ap, int);
 	else if (format[-1] == 'l' && format[-2] == 'l')
 		holder = (long long)va_arg(ap, long long);
 	else if (format[-1] == 'l')
 		holder = (long long)va_arg(ap, long);
-	holder = (base == 16 && holder < 0) ? ((unsigned int)holder) : (holder);
+	holder = ((base == 16 || base == 8) && holder < 0 && format[-1] != 'l' && format[-1] != 'j') ? ((unsigned int)holder) : (holder);
+    holder = ((base == 16 || base == 8) && HH(format)) ? ((unsigned char)holder) : (holder);
+	holder = ((base == 16 || base == 8) && format[-1] == 'h' && !HH(format)) ? ((unsigned char)holder) : (holder);
+	holder = ((base == 16 || base == 8) && LL(format)) ? ((unsigned long long)holder) : (holder);
+	holder = ((base == 16 || base == 8) && format[-1] == 'l' && !LL(format)) ? ((unsigned long)holder) : (holder);
+	holder = ((base == 16 || base == 8) && format[-1] == 'j') ? ((uintmax_t)holder) : (holder);
+	holder = ((base == 10) && format[-1] == 'j') ? ((intmax_t)holder) : (holder);
 	ft_putstr_fd_prec(ft_lltoa_base(holder, base, format), 1, precision(format, ap, tree), tree);
 	return(0);
 }
@@ -151,7 +161,7 @@ int		ft_printf(const char * restrict format, ...)
 	va_end(ap);
 	return (tree->ret);
 }
-
+/*
 int main()
 {
 	char	*hey = "whoa";
@@ -169,4 +179,4 @@ int main()
 	printf("%d %d\n", ret, ret2);
 	return(0);
 }
-
+*/
