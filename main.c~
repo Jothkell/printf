@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/09/03 21:28:20 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/09/03 19:29:26 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ int		precision(char *format, va_list ap, t_ap *tree)
 	tree->prec = 0;
 	tree->width = 0;
 	format--;
-	while (*format != '.' && *format != '%' && !isFLAG(*format))
+	while (*format != '.' && *format != '%' && *format != '-')
 		format--;
-	if(!ft_atoi(&format[1]))
+	if(*format == '%' && !ft_atoi(&format[1]))
 	{
 		tree->prec = 10000;
 		return (10000);
@@ -33,13 +33,12 @@ int		precision(char *format, va_list ap, t_ap *tree)
 	format += (isFLAG(format[1])) ? (1) : (0);
 	tree->z_pad = (format[1] == '0') ? (1) : (0);
 	tree->prec = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[1]));
-	tree->width = (isDIGIT(format[1]) && !tree->dot) ? (ft_atoi(&format[1])) : (tree->width);
-	//tree->prec -= (isDIGIT(format[1])) ? (tree->prec) : (0);
+	tree->width = (isDIGIT(format[1])) ? (ft_atoi(&format[1])) : (tree->width);
+	tree->prec -= (isDIGIT(format[1])) ? (tree->prec) : (0);
 	while (isDIGIT(format[-1]) && format[1] != '*')
 		format--;
 	tree->width = (format[1] == '*') ? (va_arg(ap, int)) : (tree->width);//ft_atoi(&format[0]));
 	tree->width = (isDIGIT(*format)) ? (ft_atoi(format)) : (tree->width);
-	tree->width -= (tree->hash) ? (2) : (0);
 	return (tree->prec);
 }
 
@@ -79,7 +78,7 @@ int		digit(va_list ap, char *format, t_ap *tree)//this should convert all to int
 	//holder = ((base == 10) && format[-1] == 'j') ? ((intmax_t)holder) : (holder);
 	tree->zero = (holder == 0) ? (1) : (0);
 	if (is_unsign(format))
-        ft_putstr_fd_prec(ft_umaxtoa_base(holder, base, tree->c), 1, precision(format, ap, tree), tree);
+        ft_putstr_fd_prec(ft_umaxtoa_base(holder, base, format), 1, precision(format, ap, tree), tree);
 	else
 		ft_putstr_fd_prec(ft_maxtoa_base(holder, base, format), 1, precision(format, ap, tree), tree);
 	return(0);
@@ -141,7 +140,6 @@ void	flags(char *c, t_ap *tree)
 	tree->l = (*c == 'l') ? (1) : (tree->l);
 	tree->ll = (*c == 'l' && c[-1] == 'l') ? (1) : (tree->ll);
 	tree->hash = (*c == '#') ? (1) : (tree->hash);
-	tree->dot = (*c == '.') ? (1) : (tree->dot);
 }
 
 int		ft_printf(const char * restrict format, ...)
@@ -178,7 +176,7 @@ int		ft_printf(const char * restrict format, ...)
 	va_end(ap);
 	return (tree->ret);
 }
-
+/*
 int main()
 {
 	char	*hey = "whoa";
@@ -189,12 +187,13 @@ int main()
 
     double dog = 420.555555;
     double doggy = 420.55555555555555;
-	ret = ft_printf("%.2s is a string", "this");
+	ret = ft_printf("%#x", 42);
 	//ft_printf("%lx", -4294967296);
 	printf("\n");
-	ret2 = printf("%.2s is a string", "this");
+	ret2 = printf("%#x", 42);
 	//printf("%lx", -4294967296);
 	printf("\n");
 	printf("%d %d\n", ret, ret2);
 	return(0);
 }
+*/

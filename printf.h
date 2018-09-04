@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/23 16:24:30 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/08/31 11:04:20 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/09/03 21:08:05 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@
 # define isID(x) (x == 'h' || x == 'l' || x == 'j' || x == 'z')
 # define HH(x) (x[-1] == 'h' && x[-2] == 'h')
 # define LL(x) (x[-1] == 'l' && x[-2] == 'l')
+# define is_unsign(x) (*x == 'x' || *x == 'X' || *x == 'o' || *x == 'O')
+# define isFLAG(x) (x == '#' || x == '-' || x == '+')
+
 
 typedef struct s_ap t_ap;
 
@@ -44,17 +47,22 @@ struct					s_ap
 	uint8_t ll;
 	uint8_t fd;
 	uint8_t decimal;
+	uint8_t hash;
+	uint8_t zero;
+	uint8_t z_pad;
+	uint8_t dot;
 	char *c;
 
 };
 
 //width, precision, left align. 
-int    bt_putstr_fd(char const *s, int fd);
+char            *ft_umaxtoa_base(uintmax_t n, uintmax_t base, char *format);
+int    bt_putstr_fd(char const *s, int fd, t_ap *tree);
 int						floot(va_list ap, char *format, t_ap *tree);
 char					*ft_ftoa_base(double n, long long base, char *format);
 void					ft_putstr_fd_prec(char *s, int fd, int prec, t_ap *tree);
 int						precision(char *format, va_list ap, t_ap *tree);
-char            		*ft_lltoa_base(long long n, long long base, char *format);
+char            		*ft_maxtoa_base(intmax_t n, intmax_t base, char *format);
 void					assign_functs(int (**p) (va_list ap, char *format, t_ap *tree), t_ap *tree);
 int						digit(va_list ap, char *format, t_ap *tree);
 int						ft_printf(const char * restrict format, ...);
