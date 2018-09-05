@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/09/03 21:28:20 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/09/04 21:16:25 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,15 @@ int		precision(char *format, va_list ap, t_ap *tree)
 	format--;
 	while (*format != '.' && *format != '%' && !isFLAG(*format))
 		format--;
-	if(!ft_atoi(&format[1]))
+	if(!ft_atoi(&format[1]) && !ft_atoi(&format[-1]))
 	{
 		tree->prec = 10000;
 		return (10000);
 	}
 	format += (isFLAG(format[1])) ? (1) : (0);
 	tree->z_pad = (format[1] == '0') ? (1) : (0);
-	tree->prec = (format[1] == '*') ? (va_arg(ap, int)) : (ft_atoi(&format[1]));
+	tree->prec = (format[1] == '*') ? (va_arg(ap, int)) : (tree->prec);
+	tree->prec = (format[0] == '.') ? (ft_atoi(&format[1])) : (tree->prec);
 	tree->width = (isDIGIT(format[1]) && !tree->dot) ? (ft_atoi(&format[1])) : (tree->width);
 	//tree->prec -= (isDIGIT(format[1])) ? (tree->prec) : (0);
 	while (isDIGIT(format[-1]) && format[1] != '*')
@@ -189,10 +190,10 @@ int main()
 
     double dog = 420.555555;
     double doggy = 420.55555555555555;
-	ret = ft_printf("%.2s is a string", "this");
+	ret = ft_printf("%5.x %5.0x", 0, 0);
 	//ft_printf("%lx", -4294967296);
 	printf("\n");
-	ret2 = printf("%.2s is a string", "this");
+	ret2 = printf("%5.x %5.0x", 0, 0);
 	//printf("%lx", -4294967296);
 	printf("\n");
 	printf("%d %d\n", ret, ret2);

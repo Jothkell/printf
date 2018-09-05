@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/23 16:24:30 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/09/03 19:29:42 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/09/03 21:08:05 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ struct					s_ap
 	uint8_t hash;
 	uint8_t zero;
 	uint8_t z_pad;
+	uint8_t dot;
 	char *c;
 
 };
