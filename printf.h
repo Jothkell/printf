@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/23 16:24:30 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/09/04 21:12:14 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/09/05 13:25:56 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 # include <stdio.h>
 # include "libft/libft.h"
 
+# define INPUTS(x) (IS_TYPE(x) || isDIGIT(x) || isID(x) || isFLAG(x))
 # define IS_UPPER(x) (x >= 'A' && x <= 'Z')
 # define IS_LOWER(x) (x >= 'a' && x <= 'z')
 # define IS_TYPE(x) (x == 's' || x == 'S' || x == 'p' || x == 'd' || x == 'D' || x == 'i' || x == 'o' || x == 'O' || x == 'u' || x == 'U' || x == 'x' || x == 'X' || x == 'c' || x == 'C' || x == 'b' || x == 'f' || x == 'F' || x == 'a' || x == 'A' || x == '%')
@@ -56,6 +57,9 @@ struct					s_ap
 };
 
 //width, precision, left align. 
+
+void    ft_put_wstr_fd_prec(wchar_t *s, int fd, int prec, t_ap *tree);
+char *ft_spad(char *s, int prec, t_ap *tree);
 char            *ft_umaxtoa_base(uintmax_t n, uintmax_t base, char *format);
 int    bt_putstr_fd(char const *s, int fd, t_ap *tree);
 int						floot(va_list ap, char *format, t_ap *tree);

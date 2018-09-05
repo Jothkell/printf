@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/22 15:12:22 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/09/04 21:16:25 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/09/05 13:51:39 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 
 int		precision(char *format, va_list ap, t_ap *tree)
 {
-	tree->prec = 0;
+	tree->prec = 10000;
 	tree->width = 0;
 	format--;
 	while (*format != '.' && *format != '%' && !isFLAG(*format))
@@ -31,7 +31,7 @@ int		precision(char *format, va_list ap, t_ap *tree)
 		return (10000);
 	}
 	format += (isFLAG(format[1])) ? (1) : (0);
-	tree->z_pad = (format[1] == '0') ? (1) : (0);
+	tree->z_pad = (format[1] == '0' && format[0] != '.') ? (1) : (0);
 	tree->prec = (format[1] == '*') ? (va_arg(ap, int)) : (tree->prec);
 	tree->prec = (format[0] == '.') ? (ft_atoi(&format[1])) : (tree->prec);
 	tree->width = (isDIGIT(format[1]) && !tree->dot) ? (ft_atoi(&format[1])) : (tree->width);
@@ -88,9 +88,29 @@ int		digit(va_list ap, char *format, t_ap *tree)//this should convert all to int
 
 int		str(va_list ap, char *format, t_ap *tree)
 {
-	char *hold = va_arg(ap, char*);
-	ft_putstr_fd_prec(hold, 1, precision(format, ap, tree), tree);
+	char *hold;
+
+	if (tree->c[0] == 's')
+		hold = va_arg(ap, char*);
+	if (tree->c[0] == 'S' || (tree->c[0] == 's' && tree->c[-1] == 'l'))
+		hold = va_arg(ap, char*);//got to make wchar_t*
+	if (!hold)
+		tree->ret += write(1, "(null)", 6);
+	else
+		ft_putstr_fd_prec(hold, 1, precision(format, ap, tree), tree);
 	return(0);
+}
+
+int character(va_list ap, char *format, t_ap *tree)
+{
+	wchar_t c;
+	if (tree->c[0] == 'c')
+		c = (unsigned char)va_arg(ap, int);
+	else if (tree->c[-1] == 'l' || tree->c[0] == 'C')
+		c = (unsigned char)va_arg(ap, int);//c = (wchar_t)va_arg(ap, wint_t);
+	write(1, &c, 1);
+	return (0);
+
 }
 
 int		percent(va_list ap, char *format, t_ap *tree)
@@ -100,17 +120,15 @@ int		percent(va_list ap, char *format, t_ap *tree)
 	tree->width--;
 	while(((tree->width) > 0) && !(tree->left))
 	{
-		write(1, " ", 1);
+		tree->ret += (tree->z_pad) ? (write(1, "0", 1)) : (write(1, " ", 1));
 		tree->width--;
-		tree->ret++;
 	}
 	write(1, "%", 1);
 	tree->ret++;
     while(((tree->width) > 0) && (tree->left))
     {
-        write(1, " ", 1);
+        tree->ret += (tree->z_pad) ? (write(1, "0", 1)) : (write(1, " ", 1));
         tree->width--;
-        tree->ret++;
     }
 	return (0);
 }
@@ -150,6 +168,7 @@ int		ft_printf(const char * restrict format, ...)
 	va_list			ap;
 	int				(*p[123]) (va_list ap, char *format, t_ap *tree);
  	int				i;
+	int ihold;
 	t_ap			*tree;
 	
 	if (!(tree = (t_ap*)ft_memalloc(sizeof(t_ap))))
@@ -162,11 +181,14 @@ int		ft_printf(const char * restrict format, ...)
 	{
 		if(format[i] == '%')
 		{
+			ihold = i;
 			i++;
-            while(!IS_TYPE(format[i]))
+            while(!IS_TYPE(format[i]) && INPUTS(format[i]) && format[i] != '\0')
                 flags((char*)&format[i++], tree);
+			tree->ret += (!INPUTS(format[i]) && format[i] != ' ' && format[i] != '\0') ? (write(1, &format[i], 1)) : (0);
+			i = (format[i] == '\0' || !INPUTS(format[i])) ? (ihold) : (i);
 			tree->c = (char*)&format[i];
-			p[format[i]](ap, (char*)&format[i], tree);//execute the right function
+			ihold += (i == ihold) ? (1) : (p[format[i]](ap, (char*)&format[i], tree));//execute the right function
 			assign_functs(p, tree);
 			i++;
 		}
@@ -179,7 +201,7 @@ int		ft_printf(const char * restrict format, ...)
 	va_end(ap);
 	return (tree->ret);
 }
-
+/*
 int main()
 {
 	char	*hey = "whoa";
@@ -190,12 +212,15 @@ int main()
 
     double dog = 420.555555;
     double doggy = 420.55555555555555;
-	ret = ft_printf("%5.x %5.0x", 0, 0);
+	ret = ft_printf("% ");
 	//ft_printf("%lx", -4294967296);
 	printf("\n");
-	ret2 = printf("%5.x %5.0x", 0, 0);
+	ret2 = printf("%");
+
 	//printf("%lx", -4294967296);
 	printf("\n");
 	printf("%d %d\n", ret, ret2);
 	return(0);
 }
+
+*/

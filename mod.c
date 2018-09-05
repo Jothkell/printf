@@ -6,7 +6,7 @@
 /*   By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/08/24 18:51:31 by jkellehe          #+#    #+#             */
-/*   Updated: 2018/09/04 21:09:49 by jkellehe         ###   ########.fr       */
+/*   Updated: 2018/09/05 11:28:50 by jkellehe         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,28 +43,24 @@ char *ft_pad(char *s, int prec, t_ap *tree)
 {
 	int i;
 	int hold;
-	int widthh;
-	int prech;
+    int widthh;
+    int prech;
 
-	i = 0;
-	hold = tree->width;
-	widthh = 0;
-	prech = 0;
-	//tree->width -= (tree->width > tree->prec) ? (tree->prec) : (tree->width);
-    tree->prec = (tree->prec <= 0) ? (ft_strlen(s)) : (tree->prec);
-	tree->width = (1/*!(NUMBERS(tree->c)*/) ? (hold - ft_strlen(s)) : (tree->width - tree->prec);
-	tree->prec -= (tree->prec > ft_strlen(s)) ? (ft_strlen(s)) : (tree->prec);
-    prech = (tree->prec <= 0) ? (0) : (tree->prec);
-    tree->prec = (tree->prec <= 0) ? (ft_strlen(s)) : (tree->prec);
-	widthh = tree->width;
+    prech = tree->prec;
+    prech = (prech > ft_strlen(s)) ? (prech) : (10000);
+	tree->prec = prech;
+    widthh = tree->width;
+    widthh -= (tree->prec != 10000) ? (ft_strlen(s) - prech) : (ft_strlen(s) - tree->zero);
+
+
     tree->ret += (tree->hash && !tree->zero && tree->z_pad) ? (write(1, "0x", 2)) : (0);
-	tree->ret += (tree->left && !(tree->zero && tree->dot)) ? (bt_putstr_fd(s, 1, tree)) : (0);
+	tree->ret += (tree->left && !(tree->zero && tree->dot)) ? (bt_putstr_fd(ft_strsub(s, 0, tree->prec), 1, tree)) : (0);
     while (widthh > 0)
     {
 		tree->ret += (tree->z_pad && !tree->left) ? (write(1, "0", 1)) : (write(1, " ", 1));
         widthh--;
     }
-	while ((prech > 0) && NUMBERS(tree->c))
+	while (prech != 10000 && (prech > 0) && NUMBERS(tree->c))
 	{
 		tree->ret += ((tree->c[0] != 'x' && tree->c[0] != 'X') || tree->z_pad) ? (write(1, "0", 1)) : (write(1, " ", 1));
 		prech--;
@@ -72,6 +68,33 @@ char *ft_pad(char *s, int prec, t_ap *tree)
 	tree->ret += (tree->hash && !tree->zero && !tree->z_pad) ? (write(1, "0x", 2)) : (0);
 	tree->ret += (!tree->left && !(tree->zero && tree->dot)) ? (bt_putstr_fd(ft_strsub(s, 0, tree->prec), 1, tree)) : (0);
 	return (s);
+}
+
+char *ft_spad(char *s, int prec, t_ap *tree)
+{
+    int i;
+    int hold;
+
+    int hwidth;
+    int hprec;
+
+	hprec = tree->prec;
+    hprec -= (hprec > ft_strlen(s)) ? (hprec) : (0);
+    hwidth = tree->width;
+    hwidth -= (ft_strlen(s) - hprec);
+	tree->ret += (tree->left && !(tree->zero && tree->dot)) ? (bt_putstr_fd(ft_strsub(s, 0, tree->prec), 1, tree)) : (0);
+    while (hwidth > 0)
+    {
+        tree->ret += (tree->z_pad && !tree->left) ? (write(1, "0", 1)) : (write(1, " ", 1));
+        hwidth--;
+    }
+    while (hprec != 10000 && (hprec > 0) && NUMBERS(tree->c))
+    {
+        tree->ret += ((tree->c[0] != 'x' && tree->c[0] != 'X') || tree->z_pad) ? (write(1, "0", 1)) : (write(1, " ", 1));
+        hprec--;
+    }
+    tree->ret += (!tree->left && !(tree->zero && tree->dot)) ? (bt_putstr_fd(ft_strsub(s, 0, tree->prec), 1, tree)) : (0);
+    return (s);
 }
 
 void	ft_fpad(char *s, t_ap *tree)
@@ -101,18 +124,25 @@ void    ft_putstr_fd_prec(char *s, int fd, int prec, t_ap *tree)
 	int i;
 
 	i = 0;
-	if (tree->hash && !tree->zero && (tree->prec == 10000))
-		tree->ret += (tree->hash && !tree->zero) ? (write(1, "0x", 2)) : (0);
-    if (!s)
-        return ;
-	if (prec != 10000 && !FLOATS(tree->c))
-		ft_pad(s, prec, tree);
-	else if (prec != 10000 && tree->decimal)
+	if (FLOATS(tree->c))
 		ft_fpad(ft_strsub(s, 0, prec), tree);
-	else if (prec != 10000)
-		ft_fpad(s, tree);
+	else if (NUMBERS(tree->c))
+		ft_pad(s, prec, tree);
 	else
-		tree->ret += !(tree->zero && tree->dot) ? (bt_putstr_fd(s, 1, tree)) : (0);
+		ft_spad(s, prec, tree);
+}
+
+void    ft_put_wstr_fd_prec(wchar_t *s, int fd, int prec, t_ap *tree)
+{
+    int i;
+
+    i = 0;
+    if (FLOATS(tree->c))
+        i+=1;//ft_fpad(ft_strsub(s, 0, prec), tree);
+    else if (NUMBERS(tree->c))
+        i++;//ft_pad(s, prec, tree);
+    else
+        i++;//ft_spad(s, prec, tree);
 }
 
 char            *ft_maxtoa_base(intmax_t n, intmax_t base, char *format)
