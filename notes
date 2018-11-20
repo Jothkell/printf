@@ -1,4 +1,4 @@
-********************************************************************************
+l********************************************************************************
                                                                                 
                                                           :::      ::::::::     
      notes                                              :+:      :+:    :+:     
@@ -6,7 +6,7 @@
      By: jkellehe <jkellehe@student.42.us.org>      +#+  +:+       +#+          
                                                   +#+#+#+#+#+   +#+             
      Created: 2018/08/22 12:20:51 by jkellehe          #+#    #+#               
-     Updated: 2018/08/31 11:07:48 by jkellehe         ###   ########.fr         
+     Updated: 2018/11/19 12:21:24 by jkellehe         ###   ########.fr         
                                                                                 
 ********************************************************************************
 
@@ -24,3 +24,15 @@ now there is a struct, now to start using it without breaking stuff.
 ________-
 friday:
 seems like the long long plan should be changed to intmax_t.
+
+
+
+_____________
+many mondays later:
+
+I am looking to turn it in today.   Here I go buddy. big buddy
+
+
+-fix all the -WWW compiling errors
+-get it to pass all ftprintf.com 
+-turn it in
